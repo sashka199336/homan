@@ -1,0 +1,2 @@
+CREATE SCHEMA IF NOT EXISTS claim_schema;
+GRANT ALL PRIVILEGES ON SCHEMA claim_schema TO postgres;

@@ -1,0 +1,96 @@
+server:
+  port: ${SERVER_PORT:8081}
+  forward-headers-strategy: framework
+  servlet:
+    context-path: /gateway
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    display-operation-id: true
+    try-it-out-enabled: true
+    urls:
+      - name: User Service
+        url: http://user-service:8888/user-service/v3/api-docs
+      - name: Claim Service
+        url: http://claim-service:8091/claim-service/v3/api-docs
+
+client-origin:
+  url: https://swagger-labs.globus-ltd.com
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    compatibility-verifier.enabled: false
+    gateway:
+      discovery:
+        default-filters:
+          - TokenRelay
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: user-service
+          uri: lb://${USER_SERVICE_NAME:user-service}
+          predicates:
+            - Path=/user-service/api/v1/users/**
+          filters:
+            - name: JwtRoleFilter
+              args:
+                requiredRole: ADMIN,USER
+                targetService: user-service
+        - id: claim-service
+          uri: lb://${CLAIM-SERVICE:claim-service}
+          predicates:
+            - Path=/claim-service/api/v1/claims/**
+          filters:
+            - name: JwtRoleFilter
+              args:
+                requiredRole: USER
+                targetService: claim-service
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin
+        - CircuitBreaker=default
+
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: ${KEYCLOAK_CLIENT}
+            client-secret: ${KEYCLOAK_SECRET}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
+            scope: openid,profile,email
+        provider:
+          keycloak:
+            issuer-uri: ${KEYCLOAK_URL}/${KEYCLOAK_REALMS}
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_URL}/${KEYCLOAK_REALMS}
+          jwk-set-uri: ${KEYCLOAK_URL}/${KEYCLOAK_REALMS}/protocol/openid-connect/certs
+
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: health, info, metrics, gateway, prometheus  # Какие endpoint доступны
+#  endpoint:
+#    health:
+#      show-details: always             # Детализация health-статуса
+#    info:
+#      env:
+#        include: app.version           # Какие данные включать в /info
+#  server:
+#    port: 8099
+
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    org.springframework.security: INFO

@@ -1,0 +1,19 @@
+services:
+  damia-adapter:
+    build:
+      context: .
+    container_name: damia-adapter
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - DAMIA_APITOKEN=${DAMIA_APITOKEN}
+      - LOGSTASH_HOST=${LOGSTASH_HOST}
+      - LOGSTASH_PORT=${LOGSTASH_PORT}
+    ports:
+      - "8083:8080"
+    restart: unless-stopped
+    networks:
+      - microservice-network
+
+networks:
+  microservice-network:
+    external: true

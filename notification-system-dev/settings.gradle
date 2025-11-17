@@ -1,0 +1,5 @@
+rootProject.name = 'notification-system'
+include 'notification-app'
+include 'kafka-test-producer'
+include 'email-notification-ms'
+include 'sms-notification-ms'

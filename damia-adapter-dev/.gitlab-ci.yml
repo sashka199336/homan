@@ -1,0 +1,8 @@
+trigger-central:
+  image: curlimages/curl:latest
+  rules:
+    - when: always
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - curl -X POST -F "token=${PIPELINE_TRIGGER_TOKEN}" -F "ref=main" -F "variables[SERVICE_NAME]=${CI_PROJECT_NAME}" -F "variables[SOURCE_BRANCH]=$CI_COMMIT_REF_NAME" "${PIPELINE_TRIGGER_URL}"

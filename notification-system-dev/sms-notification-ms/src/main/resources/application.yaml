@@ -1,0 +1,80 @@
+server:
+  port: ${SERVER_PORT:8084}
+  forward-headers-strategy: framework
+  servlet:
+    context-path: /sms-notification-ms
+
+spring:
+  application:
+    name: ${SPRING_APPLICATION_NAME:sms-notification-ms}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP:notification-group}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: ${KAFKA_CONSUMER_TRUSTED_PACKAGES:ru.globus.smsnotificationms.dto.request}
+        spring.json.use.type.headers: true
+        spring.json.type.mapping: ${KAFKA_CONSUMER_TYPE_MAPPING:SmsNotificationDto:ru.globus.smsnotificationms.dto.request.SmsNotificationDto}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.use.type.headers: true
+        spring.json.type.mapping: ${KAFKA_PRODUCER_TYPE_MAPPING:NotificationResponse:ru.globus.smsnotificationms.dto.response.NotificationResponse}
+    topic:
+      sms-notifications: ${KAFKA_TOPIC_SMS_NOTIFICATIONS:sms-notifications-topic}
+      notification-responses: ${KAFKA_TOPIC_NOTIFICATION_RESPONSES:notification-responses-topic}
+    listener:
+      missing-topics-fatal: ${KAFKA_MISSING_TOPICS_FATAL:false}
+      ack-mode: BATCH
+      type: BATCH
+
+logging:
+  config: classpath:logback.xml
+  level:
+    root: ${LOGGING_LEVEL_ROOT:INFO}
+    org.springframework: ${LOGGING_LEVEL_SPRING:DEBUG}
+    org.springframework.kafka: ${LOGGING_LEVEL_KAFKA:DEBUG}
+    ru.globus.smsnotificationms: ${LOGGING_LEVEL_APP:DEBUG}
+    ru.globus.smsnotificationms.service.SmsServiceClient: ${LOGGING_LEVEL_SMS_SERVICE:DEBUG}
+  file:
+    path: logs
+    name: logs/sms-notification-ms.log
+
+# https://sms.ru/sms/send?api_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX&to=7999999999&msg=hello+world&json=1&test=1
+sms:
+  smsProperties:
+    url: ${SMS_URL:https://sms.ru}
+    path: ${SMS_PATH:/sms/send}
+    header: ${SMS_HEADER:"application/json"}
+    key: ${SMS_API_KEY:} # Авторизацию по вашему уникальному ключу (api_id)
+    json: 1 # json=1 - Данный параметр вызывает ответ сервера в формате JSON, в котором предоставлено больше данных об отправленных сообщениях
+    test: ${SMS_TEST:1} # test=1 Имитирует отправку сообщения для тестирования ваших программ на правильность обработки ответов сервера. При этом само сообщение не отправляется и баланс не расходуется.
+    to: ${SMS_TEST_PHONE:} # Номер телефона для тестовых уведомлений
+    maxLength: ${SMS_MAX_LENGTH:70} # Максимальная длина сообщения (до 70 русских / 160 латинских символов)
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus  # Какие endpoint доступны
+  endpoint:
+    health:
+      show-details: always             # Детализация health-статуса
+    info:
+      env:
+        include: app.version           # Какие данные включать в /info
+  server:
+    port: 8099
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger
+    display-operation-id: true
+    try-it-out-enabled: true

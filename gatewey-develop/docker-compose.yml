@@ -1,0 +1,21 @@
+services:
+  gateway:
+    build:
+      context: .
+    container_name: gateway
+    environment:
+      - KEYCLOAK_CLIENT=${GATEWAY_KEYCLOAK_CLIENT}
+      - KEYCLOAK_SECRET=${GATEWAY_KEYCLOAK_SECRET}
+      - KEYCLOAK_URL=${KEYCLOAK_URL}
+      - KEYCLOAK_REALMS=${KEYCLOAK_REALMS}
+      - LOGSTASH_HOST=${LOGSTASH_HOST}
+      - LOGSTASH_PORT=${LOGSTASH_PORT}
+    ports:
+      - "8090:8081"
+    restart: unless-stopped
+    networks:
+      - microservice-network
+
+networks:
+  microservice-network:
+    external: true

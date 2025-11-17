@@ -1,0 +1,53 @@
+plugins {
+    id 'java'
+}
+
+group = 'ru.globus'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+    implementation 'net.logstash.logback:logstash-logback-encoder:8.1'
+    implementation 'org.springframework.boot:spring-boot-starter-logging'
+    implementation 'org.apache.logging.log4j:log4j-to-slf4j'
+    implementation 'org.slf4j:jul-to-slf4j'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.15.3'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.testcontainers:testcontainers'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:kafka'
+    testImplementation 'org.awaitility:awaitility:4.2.0'
+    testImplementation 'commons-codec:commons-codec:1.19.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+bootJar {
+    archiveFileName = "projectbank-test-notification-ms.jar"
+}
+
+springBoot {
+    mainClass = 'ru.globus.testproducer.KafkaTestProducerApplication'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "module-${project.name}"
+        }
+    }
+}

@@ -1,0 +1,72 @@
+spring:
+  application:
+    name: risk-aggregator
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: true
+        spring.json.type.mapping:
+          PassportRequest:globus.riskaggregatev2.dto.internal.PassportRequestEvent,CompanyRequest:globus.riskaggregatev2.dto.internal.CompanyRequestEvent,ScoringRequest:globus.riskaggregatev2.dto.internal.CompanyScoringRequestEvent,RiskRequest:globus.riskaggregatev2.dto.internal.CompanyRiskRequestEvent
+    consumer:
+      group-id: ${app.kafka.kafkaMessageGroupId}
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: '*'
+        spring.json.value.default.type: globus.riskaggregatev2.dto.crosservice.CheckCommandEvent
+        spring.json.use.type.headers: true
+        spring.json.type.mapping:
+          com.projectbank.loan.dto.LoanRiskDto:globus.riskaggregatev2.dto.crosservice.CheckCommandEvent,PassportResponse:globus.riskaggregatev2.dto.internal.PassportResponseEvent,CompanyResponse:globus.riskaggregatev2.dto.internal.CompanyResponseEvent,ScoringResponse:globus.riskaggregatev2.dto.internal.CompanyScoringResponseEvent,RiskResponse:globus.riskaggregatev2.dto.internal.CompanyRiskResponseEvent
+        listener:
+          ack-mode: RECORD
+          type: single
+  data:
+    mongodb:
+      host: ${MONGODB_HOST:localhost}
+      port: ${MONGODB_PORT:27017}
+      database: ${MONGODB_DATABASE:globus-riskaggregator}
+      username: ${MONGODB_USERNAME:app_user}
+      password: ${MONGODB_PASSWORD:pwd}
+management:
+   endpoints:
+     web:
+       exposure:
+         include: health,info,metrics,prometheus  # Какие endpoint доступны
+   endpoint:
+     health:
+       show-details: always             # Детализация health-статуса
+     info:
+       env:
+         include: app.version           # Какие данные включать в /info
+   server:
+     port: 8099
+app:
+  check-ttl-minutes: 1
+  kafka:
+    topics:
+      pass-request: aggregator-to-adapter-passport
+      pass-response: adapter-to-aggregator-passport
+      company-request: aggregator-to-adapter-company
+      company-response: adapter-to-aggregator-company
+      check-request: riskaggregator-requests
+      check-response: riskaggregator-results
+      scoring-request: aggregator-to-adapter-scoring
+      scoring-response: adapter-to-aggregator-scoring
+      risk-request: aggregator-to-adapter-risk
+      risk-response: adapter-to-aggregator-risk
+    kafkaMessageGroupId: message-group
+
+logging:
+  level:
+    root: INFO
+    org.mongodb.driver: WARN
+    org.apache.kafka: ERROR
+    org.springframework.kafka: ERROR
+    org.springframework.data.mongodb.core.MongoTemplate: WARN
+server:
+  port: 80

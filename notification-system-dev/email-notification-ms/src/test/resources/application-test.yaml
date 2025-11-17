@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: email-notification-ms
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    consumer:
+      group-id: test-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "ru.globus.emailnotificationms.dto.request.*, ru.globus.emailnotificationms.dto.response.*"
+        spring.json.use.type.headers: true
+        spring.json.type.mapping: EmailNotificationDto:ru.globus.emailnotificationms.dto.request.EmailNotificationDto, NotificationResponse:ru.globus.emailnotificationms.dto.response.NotificationResponse
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.trusted.packages: "ru.globus.emailnotificationms.dto.request.*, ru.globus.emailnotificationms.dto.response.*"
+        spring.json.use.type.headers: true
+        spring.json.type.mapping: EmailNotificationDto:ru.globus.emailnotificationms.dto.request.EmailNotificationDto,NotificationResponse:ru.globus.emailnotificationms.dto.response.NotificationResponse
+    topic:
+      email-notifications: email-notifications-topic
+      notification-responses: notification-responses-topic
+    listener:
+      ack-mode: BATCH
+      type: BATCH
+
+logging:
+  level:
+    root: INFO
+    org.springframework: DEBUG
+    org.springframework.kafka: DEBUG
+    ru.globus.emailnotificationms: DEBUG
+
+email:
+  mailProperties:
+    host: ${GREEN_MAIL_HOST}
+    port: ${GREEN_MAIL_PORT}
+    transport:
+      protocol: smtp
+    smtp:
+      auth: true
+      ssl:
+        enable: false
+    debug: true
+    username: test
+    password: password
+    mail-from: mail-from@test.com
+    subject: "Test Notification"
+    mail-to:

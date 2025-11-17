@@ -1,0 +1,23 @@
+services:
+  risk-aggregate:
+    build:
+      context: .
+    container_name: risk-aggregate
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - MONGODB_HOST=${MONGODB_HOST}
+      - MONGODB_PORT=${MONGODB_PORT}
+      - MONGODB_DATABASE=${MONGODB_DATABASE}
+      - MONGODB_USERNAME=${MONGODB_USERNAME}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - LOGSTASH_HOST=${LOGSTASH_HOST}
+      - LOGSTASH_PORT=${LOGSTASH_PORT}
+    ports:
+      - "8081:80"
+    restart: unless-stopped
+    networks:
+      - microservice-network
+
+networks:
+  microservice-network:
+    external: true

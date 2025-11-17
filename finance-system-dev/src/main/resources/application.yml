@@ -1,0 +1,69 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+    info:
+      env:
+        include: app.version
+  server:
+    port: 8099
+
+spring:
+  application:
+    name: finance-system
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP_ID:account-service-group}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: com.globus.financesystem.kafka.*
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 5
+      linger-ms: 5
+    topic:
+      payment-account: payment.account.direct-events
+      account-payment: account.payment.direct-events
+      claim-account: account_events
+      account-claim: claim_direct
+
+  datasource:
+    url: ${POSTGRES_URL}/${POSTGRES_DB}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      auto-commit: false
+      schema: finance_service
+
+  jpa:
+    properties:
+      hibernate.default_schema: finance_service
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yml
+    default-schema: finance_service
+    enabled: true
+
+logging:
+  level:
+    liquibase: DEBUG
+    org.apache.kafka: INFO
+    org.springframework.kafka: DEBUG
+    org.springframework.jdbc.core: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.springframework.kafka.config: DEBUG
+    org.springframework.kafka.listener: DEBUG
+    com.globus.financesystem.kafka: DEBUG

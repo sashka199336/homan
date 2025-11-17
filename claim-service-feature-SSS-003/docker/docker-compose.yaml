@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+
+  database:
+    image: postgres:12.3
+    container_name: claim_db
+    environment:
+      POSTGRES_DB: claim_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql
+    restart: always
+
+  claim-service:
+    image: claim-service-image:latest
+    container_name: claim_app
+    environment:
+      - LOGSTASH_HOST=logstash
+      - LOGSTASH_PORT=5000
+      - LOG_LEVEL=DEBUG
+      - ENV=production
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/claim_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    ports:
+      - "8080:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: always

@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: v1_create_schema
+      author: team-one
+      changes:
+        - sqlFile:
+            path: classpath:/db/changelog/schemes/v1_create_schema.sql
+            endDelimiter: ;
+            splitStatements: true
+            stripComments: true

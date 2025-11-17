@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: kafka-test-producer
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.trusted.packages: ru.globus.testproducer.dto
+        spring.json.add.type.headers: true
+        spring.json.type.mapping: |
+          NotificationDto: ru.globus.testproducer.dto.NotificationDto,
+          NotificationRuleDto: ru.globus.testproducer.dto.NotificationRuleDto
+    consumer:
+      group-id: test-group
+      auto-offset-reset: earliest
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: ru.globus.testproducer.dto
+        spring.json.type.mapping: |
+          NotificationDto: ru.globus.testproducer.dto.NotificationDto,
+          NotificationRuleDto: ru.globus.testproducer.dto.NotificationRuleDto
+    topic:
+      notifications: notifications-topic
+      notifications-rule: notifications-rule-topic
+
+logging:
+  level:
+    root: INFO
+    org.springframework.kafka: DEBUG

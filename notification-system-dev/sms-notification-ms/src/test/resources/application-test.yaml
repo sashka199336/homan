@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: sms-notification-ms
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    consumer:
+      group-id: test-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "ru.globus.smsnotificationms.dto.request.*, ru.globus.smsnotificationms.dto.response.*"
+        spring.json.use.type.headers: true
+        spring.json.type.mapping: SmsNotificationDto:ru.globus.smsnotificationms.dto.request.SmsNotificationDto, NotificationResponse:ru.globus.smsnotificationms.dto.response.NotificationResponse
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.trusted.packages: "ru.globus.smsnotificationms.dto.request.*, ru.globus.smsnotificationms.dto.response.*"
+        spring.json.use.type.headers: true
+        spring.json.type.mapping: SmsNotificationDto:ru.globus.smsnotificationms.dto.request.SmsNotificationDto,NotificationResponse:ru.globus.smsnotificationms.dto.response.NotificationResponse
+    topic:
+      email-notifications: sms-notifications-topic
+      notification-responses: notification-responses-topic
+    listener:
+      ack-mode: BATCH
+      type: BATCH
+
+logging:
+  level:
+    root: INFO
+    org.springframework: DEBUG
+    org.springframework.kafka: DEBUG
+    ru.globus.smsnotificationms: DEBUG
+
+
+# https://sms.ru/sms/send?api_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX&to=7999999999&msg=hello+world&json=1&test=1
+sms:
+  smsProperties:
+    url: "http://localhost:8888"
+    path: "sms/send"
+    header: "application/json"
+    key: "12345678-1234-1234-1234-123456789012" # Авторизацию по вашему уникальному ключу (api_id)
+    json: "1" # json=1 - Данный параметр вызывает ответ сервера в формате JSON, в котором предоставлено больше данных об отправленных сообщениях
+    test: "1" # test=1 Имитирует отправку сообщения для тестирования ваших программ на правильность обработки ответов сервера. При этом само сообщение не отправляется и баланс не расходуется.
+    to: "" # Номер телефона для тестовых уведомлений
+    maxLength: "70" # Максимальная длина сообщения (до 70 русских / 160 латинских символов)

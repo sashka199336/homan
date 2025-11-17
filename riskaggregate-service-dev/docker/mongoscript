@@ -1,0 +1,3 @@
+docker exec -it mongodb mongosh -u usr -p pwd --authenticationDatabase admin
+use globus-riskaggregator
+db.createUser({ user: "app_user", pwd: "pwd", roles: [{ role: "readWrite", db: "globus-riskaggregator" }] })

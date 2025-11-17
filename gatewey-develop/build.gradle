@@ -1,0 +1,76 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.3'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id 'maven-publish'
+}
+
+group = 'com.api'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	set('springCloudVersion', "2023.0.0")
+}
+dependencies {
+	implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j'
+	implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.9'
+	implementation 'com.auth0:java-jwt:3.18.2'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	implementation 'org.slf4j:slf4j-api:2.0.9'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	implementation 'io.micrometer:micrometer-registry-prometheus:1.15.3'
+	implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+
+			artifact(tasks.bootJar) {
+				classifier = 'boot'
+			}
+			groupId = project.group
+			artifactId = 'api-gateway'
+			version = project.version
+		}
+	}
+
+	repositories {
+		maven {
+			url = System.getenv("CI_NEXUS_URL")
+			allowInsecureProtocol = true
+			credentials {
+				username = System.getenv("CI_NEXUS_USER")
+				password = System.getenv("CI_NEXUS_PASSWORD")
+			}
+		}
+	}
+}
+	tasks.named('test') {
+		useJUnitPlatform()
+	}

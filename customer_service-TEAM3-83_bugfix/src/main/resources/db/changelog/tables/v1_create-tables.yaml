@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: v1_create_tables
+      author: team-three
+      changes:
+        - sqlFile:
+            path: classpath:/db/changelog/tables/v1_create_tables.sql
+            endDelimiter: ;
+            splitStatements: true
+            stripComments: true

@@ -1,0 +1,71 @@
+spring:
+  application:
+    name: damia-adapter
+    logging:
+      level:
+        com.globus.damiaadapter: DEBUG
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: true
+        spring.json.type.mapping: ScoringResponse:com.globus.damiaadapter.dto.internal.CompanyScoringResponseEvent,RiskResponse:com.globus.damiaadapter.dto.internal.CompanyRiskResponseEvent
+
+    consumer:
+      group-id: ${app.kafka.kafkaMessageGroupId}
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: com.globus.damiaadapter.dto.internal,com.globus.damiaadapter.dto.*
+        spring.json.use.type.headers: true
+        spring.json.type.mapping: ScoringRequest:com.globus.damiaadapter.dto.internal.CompanyScoringRequestEvent,RiskRequest:com.globus.damiaadapter.dto.internal.CompanyRiskRequestEvent
+        listener:
+          ack-mode: RECORD
+          type: single
+
+damia:
+  apitoken: ${DAMIA_APITOKEN}
+  useragent: Globus-Risk
+  integration-api:
+    scoring: https://api.damia.ru
+    endpoint-scoring: /scoring/fincoefs
+    endpoint-risk: /scoring/score
+logging:
+  level:
+    root: INFO
+    com.globus.damiaadapter: DEBUG
+
+app:
+  kafka:
+    topics:
+      scoring-request: aggregator-to-adapter-scoring
+      scoring-response: adapter-to-aggregator-scoring
+      risk-request: aggregator-to-adapter-risk
+      risk-response: adapter-to-aggregator-risk
+    kafkaMessageGroupId: riskaggregate-internal-group
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus   # Какие endpoint доступны
+  endpoint:
+    health:
+      show-details: always             # Детализация health-статуса
+    info:
+      env:
+        include: app.version           # Какие данные включать в /info
+  server:
+    port: 8099
+
+feign:
+  client:
+    config:
+      default:
+        loggerLevel: BASIC
+        connectTimeout: 21000
+        readTimeout: 21000

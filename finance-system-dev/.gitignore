@@ -1,0 +1,56 @@
+# Default ignored files
+shelf/
+.idea/workspace.xml
+# Environment-dependent path to Maven home directory
+mavenHomeManager.xml
+# IDE files
+.idea/
+*.iml
+*.iws
+# Build artifacts
+target/
+*.class
+*.jar
+*.war
+compiler.xml
+encodings.xml
+jarRepositories.xml
+misc.xml
+vcs.xml
+/.fastRequest/config/fastRequestCurrentProjectEnvironment.json
+/gradle/
+/.gradle/buildOutputCleanup/buildOutputCleanup.lock
+/.gradle/buildOutputCleanup/cache.properties
+/.gradle/8.13/checksums/checksums.lock
+/.gradle/8.13/executionHistory/executionHistory.bin
+/.gradle/8.13/executionHistory/executionHistory.lock
+/.gradle/file-system.probe
+/.gradle/8.13/fileHashes/fileHashes.bin
+/.gradle/8.13/fileHashes/fileHashes.lock
+/.gradle/8.13/gc.properties
+/.gradle/vcs-1/gc.properties
+/gradlew
+/gradlew.bat
+/.gradle/8.13/fileChanges/last-build.bin
+/.gradle/8.13/checksums/md5-checksums.bin
+/.gradle/buildOutputCleanup/outputFiles.bin
+/build/reports/problems/problems-report.html
+/.gradle/8.13/fileHashes/resourceHashesCache.bin
+/.gradle/8.13/checksums/sha1-checksums.bin
+/build/resources/main/db/changelog/000001-create-account-table.xml
+/build/resources/main/db/changelog/000002-create-notifications-table.xml
+/logs/app.log
+/build/resources/main/application.yml
+/build/resources/main/db/changelog/db.changelog-master.yaml
+/build/resources/main/logback-spring.xml
+/build/generated/sources/annotationProcessor/java/main/com/globus/financesystem/mapper/NotificationMapperImpl.java
+/build/tmp/compileJava/previous-compilation-data.bin
+/build/resources/main/db/changelog/scripts/001-create-account-table.sql
+/build/tmp/compileJava/compileTransaction/stash-dir/CreditRequest.class.uniqueId4
+/build/tmp/compileJava/compileTransaction/stash-dir/CreditRequestConsumer.class.uniqueId3
+/build/tmp/compileJava/compileTransaction/stash-dir/CreditResponse.class.uniqueId2
+/build/tmp/compileJava/compileTransaction/stash-dir/CreditResponseProducer.class.uniqueId1
+/build/tmp/compileJava/compileTransaction/stash-dir/CreditService.class.uniqueId0
+/logs/kafka.log
+.env
+src/main/resources/application-local.yml

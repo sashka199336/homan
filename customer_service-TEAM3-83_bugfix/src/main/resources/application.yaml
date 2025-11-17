@@ -1,0 +1,64 @@
+spring:
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5444}/${POSTGRES_DB:customer_service}
+    username: ${POSTGRES_USERNAME:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        default_schema: customer_service
+    hibernate:
+      ddl-auto: none
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: true
+        spring.json.type.mapping: NotificationRuleDto:com.globus_bank.customer_service.dto.kafka.NotificationRuleDto
+    topic:
+      notifications-rule: notifications-rule-topic
+    template:
+      default-topic: notifications-rule-topic
+management:
+  server:
+    port: 8099
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+    info:
+      env:
+        include: app.version
+  metrics:
+    export:
+      prometheus:
+  enabled: true
+
+server:
+  forward-headers-strategy: framework
+  servlet:
+    context-path: /customer-service
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger
+    display-operation-id: true
+    try-it-out-enabled: true
+
+client-origin:
+  url: https://swagger-labs.globus-ltd.com

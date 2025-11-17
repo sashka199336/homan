@@ -1,0 +1,51 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: payment-service
+
+  config:
+    import: optional:file:.env[.properties], application-kafka.yaml
+
+  datasource:
+    url: ${POSTGRES_URL}/${POSTGRES_DB}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    hikari:
+      schema: ${POSTGRES_SCHEMA:payment_schema}
+      connection-init-sql: CREATE SCHEMA IF NOT EXISTS ${POSTGRES_SCHEMA:payment_schema}
+      connection-timeout: 6000
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/changelog-master.yaml
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  endpoint:
+    health:
+      show-details: always
+    info:
+      env:
+        include: app.version
+  server:
+    port: 8099
+
+logging:
+  level:
+    com.globus.payment_service: TRACE
+    org.apache.kafka: WARN

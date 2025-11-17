@@ -1,0 +1,51 @@
+server:
+  port: ${SERVER_PORT:8081}
+  forward-headers-strategy: framework
+  servlet:
+    context-path: /kafka-test-producer
+
+spring:
+  application:
+    name: ${SPRING_APPLICATION_NAME:kafka-test-producer}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: ${KAFKA_PRODUCER_ADD_TYPE_HEADERS:true}
+        spring.json.type.mapping: ${KAFKA_PRODUCER_TYPE_MAPPING:NotificationDto:ru.globus.testproducer.dto.NotificationDto,NotificationRuleDto:ru.globus.testproducer.dto.NotificationRuleDto}
+    topic:
+      notifications: ${KAFKA_TOPIC_NOTIFICATIONS:notifications-topic}
+      notifications-rule: ${KAFKA_TOPIC_NOTIFICATIONS_RULE:notifications-rule-topic}
+
+logging:
+  config: classpath:logback.xml
+  level:
+    root: ${LOGGING_LEVEL_ROOT:INFO}
+    org.springframework.kafka: ${LOGGING_LEVEL_KAFKA:DEBUG}
+  file:
+    path: logs
+    name: logs/kafka-test-producer.log
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus  # Какие endpoint доступны
+  endpoint:
+    health:
+      show-details: always             # Детализация health-статуса
+    info:
+      env:
+        include: app.version           # Какие данные включать в /info
+  server:
+    port: 8099
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger
+    display-operation-id: true
+    try-it-out-enabled: true

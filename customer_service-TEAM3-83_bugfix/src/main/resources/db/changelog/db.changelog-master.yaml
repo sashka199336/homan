@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: classpath:/db/changelog/schemes/v1_create-schema.yaml
+  - include:
+      file: classpath:/db/changelog/tables/v1_create-tables.yaml

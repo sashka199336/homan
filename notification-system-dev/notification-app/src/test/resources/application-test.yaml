@@ -1,0 +1,74 @@
+spring:
+  application:
+    name: notification-system
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    consumer:
+      group-id: test-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: |
+          ru.globus.notificationsystem.dto.request,
+          ru.globus.notificationsystem.dto.response
+        spring.json.use.type.headers: true
+        spring.json.type.mapping: |
+          NotificationDto:ru.globus.notificationsystem.dto.request.NotificationDto,
+          NotificationRuleDto:ru.globus.notificationsystem.dto.request.NotificationRuleDto,
+          NotificationResponse:ru.globus.notificationsystem.dto.response.NotificationResponse,
+          EmailNotificationDto: ru.globus.notificationsystem.dto.request.EmailNotificationDto,
+          SmsNotificationDto: ru.globus.notificationsystem.dto.request.SmsNotificationDto,
+          PushNotificationDto: ru.globus.notificationsystem.dto.request.PushNotificationDto,
+          WebNotificationDto: ru.globus.notificationsystem.dto.request.WebNotificationDto
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.trusted.packages: |
+          ru.globus.notificationsystem.dto.request,
+          ru.globus.notificationsystem.dto.response
+        spring.json.use.type.headers: true
+        spring.json.type.mapping: |
+          NotificationDto:ru.globus.notificationsystem.dto.request.NotificationDto,
+          NotificationRuleDto:ru.globus.notificationsystem.dto.request.NotificationRuleDto,
+          NotificationResponse:ru.globus.notificationsystem.dto.response.NotificationResponse,
+          EmailNotificationDto: ru.globus.notificationsystem.dto.request.EmailNotificationDto,
+          SmsNotificationDto: ru.globus.notificationsystem.dto.request.SmsNotificationDto,
+          PushNotificationDto: ru.globus.notificationsystem.dto.request.PushNotificationDto,
+          WebNotificationDto: ru.globus.notificationsystem.dto.request.WebNotificationDto
+    topic:
+      notifications: notifications-topic
+      notifications-rule: notifications-rule-topic
+      notification-responses: notification-responses-topic
+      email-notifications: email-notifications-topic
+      sms-notifications: sms-notifications-topic
+      push-notifications: push-notifications-topic
+      web-notifications: web-notifications-topic
+    listener:
+      missing-topics-fatal: false
+      ack-mode: BATCH
+      type: BATCH
+  datasource:
+    url: jdbc:tc:postgresql:latest:///test_notification_db
+    username: testuser
+    password: testpass
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  jpa:
+    hibernate:
+      jdbc:
+        lob:
+          non_contextual_creation: true
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        id:
+          uuid_generator_strategy: org.hibernate.id.uuid.StandardRandomStrategy
+
+logging:
+  level:
+    root: INFO
+    org.springframework: DEBUG
+    org.springframework.kafka: DEBUG
+    ru.globus.notificationsystem: TRACE

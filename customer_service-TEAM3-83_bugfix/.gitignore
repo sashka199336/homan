@@ -1,0 +1,16 @@
+# Gradle
+build/
+.gradle/
+
+# IntelliJ IDEA
+.idea
+*.iws
+*.iml
+*.ipr
+
+# VS Code
+.vscode/
+
+# Other
+HELP.md
+target/
